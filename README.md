@@ -27,7 +27,7 @@ sudo apt install xdelta3 7zip curl npm nodejs wine
 sudo apt install dotnet-sdk
 ## Debian 安装 .NET SDK 参考 https://learn.microsoft.com/zh-cn/dotnet/core/install/linux-debian
 
-# Fedora / REHL / 其它 Fedora 系发行版
+# Fedora / RHEL / 其它 Fedora 系发行版
 sudo dnf install xdelta 7zip curl npm nodejs dotnet-sdk wine
 
 # Arch Linux / Arch Linux ARM / Manjaro / CachyOS / 其它 Arch 系发行版
@@ -36,7 +36,7 @@ sudo pacman -S xdelta3 7zip curl npm nodejs dotnet-sdk wine
 
 3. 去 [PowerShell Github](https://github.com/PowerShell/PowerShell/releases/latest) 安装PowerShell并把它们放到Path变量里
 
-    - 若你使用的是 Arch 系发行版，可以使用AUR安装它:
+    - 若你使用的是 Arch 系发行版，可以使用AUR安装它（这里使用`yay`作为其中一个AUR助手的示例）:
 
 ```bash
 # 主线版本
