@@ -18,7 +18,7 @@
 git apply LinuxPackaging.patch
 ```
 
-1. 安装相关工具（若已安装可以跳过）:
+2. 安装相关工具（若已安装可以跳过）:
 
 ```bash
 # Debian / Ubuntu / 其它 Debian 系发行版
@@ -31,7 +31,8 @@ sudo dnf install xdelta 7zip curl
 sudo pacman -S xdelta3 7zip curl
 ```
 
-1. 去 [PowerShell Github](https://github.com/PowerShell/PowerShell/releases/latest) 安装PowerShell并把它们放到Path变量里
+3. 去 [PowerShell Github](https://github.com/PowerShell/PowerShell/releases/latest) 安装PowerShell并把它们放到Path变量里
+
     - 若你使用的是 Arch 系发行版，可以使用AUR安装它:
 
 ```bash
@@ -45,7 +46,8 @@ yay -S powershell-lts-bin
 yay -S powershell-preview-bin
 ```
 
-1. 填充 `/patcher` 目录为以下内容:
+4. 填充 `/patcher` 目录为以下内容:
+
     - 其中，这些文件可以在 [gm3dr/DeltaruneChinesePatcher](https://github.com/gm3dr/DeltaruneChinesePatcher/releases/latest) 仓库里取得
 
 ```text
@@ -55,17 +57,17 @@ yay -S powershell-preview-bin
 ├── win
 │   └── Windows 补丁安装器
 └── winold
-│   └── Windows 旧版补丁安装器
+    └── Windows 旧版补丁安装器
 ```
 
-1. 根据原仓库的 [工作流简介](https://github.com/gm3dr/DeltaruneChinese#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E4%BB%8B-powershell-%E8%84%9A%E6%9C%AC) 构建补丁
+5. 根据原仓库的 [工作流简介](https://github.com/gm3dr/DeltaruneChinese#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%AE%80%E4%BB%8B-powershell-%E8%84%9A%E6%9C%AC) 构建补丁
+
     - 但是，这些PowerShell脚本需要以下面的方式来运行
+    - 其中， `*.ps1` 为脚本路径
 
 ```bash
 pwsh ./*.ps1 
 ```
-
-其中， `*.ps1` 为脚本路径
 
 ## ⚠️ 免责声明
 
