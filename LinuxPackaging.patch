@@ -1,0 +1,152 @@
+diff --git "a/1-\345\244\215\345\210\266datawin.ps1" "b/1-\345\244\215\345\210\266datawin.ps1"
+index a5c4506..6e13ba0 100644
+--- "a/1-\345\244\215\345\210\266datawin.ps1"
++++ "b/1-\345\244\215\345\210\266datawin.ps1"
+@@ -15,7 +15,7 @@ if ($IsWindows -or $env:OS -like "*Windows*") {
+     $AppsDir = "$env:HOME/Library/Application Support/Steam/Steam.AppBundle/Steam/Contents/MacOS/steamapps/content"
+ } elseif ($IsLinux) {
+     $DirInst = "$env:HOME/.local/share/Steam/steamapps/common/DELTARUNE"
+-    $AppsDir = "$env:HOME/.local/share/Steam/steamapps/content"
++    $AppsDir = "$env:HOME/.local/share/Steam/ubuntu12_32/steamapps/content"
+ } else {
+     Write-Error "Unsupported OS."
+     exit
+@@ -64,4 +64,4 @@ Copy-File (Join-Path $DirDemoWin "data.win") "workspace/demo/data.win"
+ Copy-File (Join-Path $DirDemoWin "data.win") "data_win/demo/data.win"
+ Copy-File (Join-Path $DirDemoMac "game.ios") "data_win/demo/game.ios"
+ 
+-Write-Host "Extraction complete!" -ForegroundColor Cyan
+\ No newline at end of file
++Write-Host "Extraction complete!" -ForegroundColor Cyan
+diff --git "a/2-\344\270\213\350\275\275\346\226\207\346\234\254.ps1" "b/2-\344\270\213\350\275\275\346\226\207\346\234\254.ps1"
+index 7a5ca8b..ed3c4d1 100644
+--- "a/2-\344\270\213\350\275\275\346\226\207\346\234\254.ps1"
++++ "b/2-\344\270\213\350\275\275\346\226\207\346\234\254.ps1"
+@@ -7,6 +7,6 @@ if (Test-Path "secrets.ps1") { . ./secrets.ps1 }
+ $chapters = @("ch1", "ch2", "ch3", "ch4", "ch5")
+ foreach ($c in $chapters) {
+     Write-Host "Downloading $c..."
+-    curl.exe -H "Authorization: Token $env:TOKEN" "$($env:URL)/api/translations/deltarune/$c/en/file/" -o "./workspace/$c/imports/text_src/en.json"
+-    curl.exe -H "Authorization: Token $env:TOKEN" "$($env:URL)/api/translations/deltarune/$c/zh_Hans/file/" -o "./workspace/$c/imports/text_src/cn.json"
++    curl -H "Authorization: Token $env:TOKEN" "$($env:URL)/api/translations/deltarune/$c/en/file/" -o "./workspace/$c/imports/text_src/en.json"
++    curl -H "Authorization: Token $env:TOKEN" "$($env:URL)/api/translations/deltarune/$c/zh_Hans/file/" -o "./workspace/$c/imports/text_src/cn.json"
+ }
+diff --git "a/5-\347\224\237\346\210\220\346\261\211\345\214\226\350\241\245\344\270\201.ps1" "b/5-\347\224\237\346\210\220\346\261\211\345\214\226\350\241\245\344\270\201.ps1"
+index 14d8bca..ffafb99 100644
+--- "a/5-\347\224\237\346\210\220\346\261\211\345\214\226\350\241\245\344\270\201.ps1"
++++ "b/5-\347\224\237\346\210\220\346\261\211\345\214\226\350\241\245\344\270\201.ps1"
+@@ -16,10 +16,10 @@ Write-Host "Build date : $date"
+ $TempDir     = "temp"
+ 
+ $PatchDirs = @{
+-    "Win"   = "$TempDir\patch"
+-    "Mac"   = "$TempDir\patch_mac"
+-    "WinDemo" = "$TempDir\patch_demo"
+-    "MacDemo" = "$TempDir\patch_mac_demo"
++    "Win"   = "$TempDir/patch"
++    "Mac"   = "$TempDir/patch_mac"
++    "WinDemo" = "$TempDir/patch_demo"
++    "MacDemo" = "$TempDir/patch_mac_demo"
+ }
+ 
+ # ---------- 函数 ----------
+@@ -34,7 +34,7 @@ function New-CleanDir($path) {
+ }
+ 
+ function Make-XDelta($src, $dst, $patch) {
+-    tool/xdelta3 -S lzma -e -s $src $dst $patch
++    xdelta3 -S lzma -e -s $src $dst $patch
+ }
+ 
+ function Copy-Lang($ch, $dest) {
+@@ -46,10 +46,10 @@ function Copy-Lang($ch, $dest) {
+ 
+ function Process-Chapter($ch) {
+     Write-Host "Processing Chapter $ch..."
+-    Make-XDelta "data_win\ch$ch\data.win" "workspace\result\ch$ch\data.win" "$($PatchDirs.Win)\chapter$ch.xdelta"
++    Make-XDelta "./data_win/ch$ch/data.win" "workspace/result/ch$ch/data.win" "./$($PatchDirs.Win)/chapter$ch.xdelta"
+     Copy-Lang $ch "$($PatchDirs.Win)\chapter${ch}_windows"
+ 
+-    Make-XDelta "data_win\ch$ch\game.ios" "workspace\result\ch$ch\data.win" "$($PatchDirs.Mac)\chapter$ch.xdelta"
++    Make-XDelta "./data_win/ch$ch/game.ios" "workspace/result/ch$ch/data.win" "$($PatchDirs.Mac)/chapter$ch.xdelta"
+     Copy-Lang $ch "$($PatchDirs.Mac)\chapter${ch}_mac"
+ 
+     # Chapter 3 videos
+@@ -74,7 +74,7 @@ function Process-Chapter($ch) {
+ 
+ function Build-Patch($dir, $tag, $type) {
+     $PureName   = "patch_chs_${tag}_$date.7z"
+-    tool/7z a -t7z -mx=9 -ms=on -mmt=on $PureName ".\$dir\*"
++    7z a -t7z -mx=9 -ms=on -mmt=on $PureName "./$dir/*"
+ }
+ 
+ function Build-SfxInstaller($outputFile, $Platform) {
+@@ -99,11 +99,12 @@ Copy-Item "workspace\result\demo\*.json" "$($PatchDirs.WinDemo)/lang" -Force
+ Copy-Item "workspace\result\demo\*.json" "$($PatchDirs.MacDemo)/lang" -Force
+ 
+ # ---------- Main & Demo ----------
+-Make-XDelta "data_win\main\data.win" "workspace\result\main\data.win" "$($PatchDirs.Win)\main.xdelta"
+-Make-XDelta "data_win\main\game.ios" "workspace\result\main\data.win" "$($PatchDirs.Mac)\main.xdelta"
++Make-XDelta "./data_win/main/data.win" "./workspace/result/main/data.win" "$($PatchDirs.Win)/main.xdelta"
++Make-XDelta "./data_win/main/game.ios" "./workspace/result/main/data.win" "$($PatchDirs.Mac)/main.xdelta"
+ 
+-Make-XDelta "data_win\demo\data.win" "workspace\result\demo\data.win" "$($PatchDirs.WinDemo)\main.xdelta"
+-Make-XDelta "data_win\demo\game.ios" "workspace\result\demo\data.win" "$($PatchDirs.MacDemo)\main.xdelta"
++
++Make-XDelta "./data_win/demo/data.win" "./workspace/result/demo/data.win" "$($PatchDirs.WinDemo)/main.xdelta"
++Make-XDelta "./data_win/demo/game.ios" "./workspace/result/demo/data.win" "$($PatchDirs.MacDemo)/main.xdelta"
+ 
+ # ---------- 时间归一化 ----------
+ Normalize-Timestamp $TempDir
+@@ -120,7 +121,7 @@ foreach ($t in $Tasks) { Build-Patch $t.Dir $t.Tag $t.Type }
+ # ---------- 平台安装包 ----------
+ foreach ($p in @("linux", "win", "winold")) {
+     Write-Host "Packaging installer for $p..."
+-    $PlatformDir = "$TempDir\$p"
++    $PlatformDir = "$TempDir/$p"
+     New-Item -ItemType Directory -Path $PlatformDir -Force | Out-Null
+     Copy-Item "patcher\$p\*" $PlatformDir -Recurse -Force
+     $ReadmePath = "$PlatformDir\汉化更新日志-readme-$date.txt"
+@@ -132,16 +133,14 @@ foreach ($p in @("linux", "win", "winold")) {
+         Copy-Item "patch_chs_windowslinux_$date.7z" $PlatformDir
+         Copy-Item "patch_chs_windowslinux_demo_$date.7z" $PlatformDir
+         Normalize-Timestamp $PlatformDir
+-        tool/7z a -t7z -mx=9 -ms=on -mmt=on "temp\win.7z" ".\$PlatformDir" 
+-        Build-SfxInstaller "【Win10+】三角符文汉化补丁-V$date.exe" $p
++        7z a -t7z -mx=9 -ms=on -mmt=on "【Win10+】三角符文汉化补丁-V$date.7z" "./$PlatformDir" 
+ 
+     }
+     elseif ($p -eq "winold") { 
+         Copy-Item "patch_chs_windowslinux_$date.7z" $PlatformDir
+         Copy-Item "patch_chs_windowslinux_demo_$date.7z" $PlatformDir
+         Normalize-Timestamp $PlatformDir
+-        tool/7z a -t7z -mx=9 -ms=on -mmt=on "temp\winold.7z" ".\$PlatformDir" 
+-        Build-SfxInstaller "【Win7-】三角符文汉化补丁-V$date.exe" $p
++        7z a -t7z -mx=9 -ms=on -mmt=on "【Win7-】三角符文汉化补丁-V$date.7z" "./$PlatformDir" 
+     }
+     elseif ($p -eq "linux") { 
+         Copy-Item "cn_installer\linux\*" $PlatformDir -Recurse -Force
+diff --git a/src/Importer.cs b/src/Importer.cs
+index 937609b..dda07c2 100644
+--- a/src/Importer.cs
++++ b/src/Importer.cs
+@@ -418,10 +418,11 @@ namespace deltarunePacker
+                 {
+                     StartInfo = new ProcessStartInfo()
+                     {
+-                        FileName = "tool/bmfont64.exe",
++                        FileName = "wine",
+                         CreateNoWindow = true,
+                         RedirectStandardOutput = true,
+                         ArgumentList = {
++                            "tool/bmfont64.exe",
+                             "-c", configPath,
+                             "-o", outputPath,
+                             "-t", dictPath
+@@ -548,4 +549,4 @@ namespace deltarunePacker
+         }
+ 
+     }
+-}
+\ No newline at end of file
++}
